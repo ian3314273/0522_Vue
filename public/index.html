@@ -1,13 +1,88 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Express</title>
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
 </head>
-
 <body>
-  <h1>Express</h1>
-  <p>Welcome to Express</p>
-</body>
+<div id="app">
+  <form @submit.prevent="insertData">
+    <p>
+      <input type="text" id="provider" v-model="provider" placeholder="provider">
+    </p>
+    <p>
+      <input type="text" id="movie_name" v-model="movie_name" placeholder="movie_name">
+    </p>
+    <p>
+        <input type="text" id="quote" v-model="quote" placeholder="quote">
+    </p>
+    <button type="submit">Insert</button>
+    <span>{{insertResult}}</span>
+  </form>
+  <button @click="fetchData">Show Data</button>
+  <table>
+    <thead>
+    <tr>
+      <th>id</th>
+      <th>provider</th>
+      <th>movie_name</th>
+      <th>quote</th>
+      <th>vote_count</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="item in items" :key="item.id">
+      <td>{{item.id}}</td>
+      <td>{{item.provider}}</td>
+      <td>{{item.movie_name}}</td>
+      <td>{{item.quote}}</td>
+      <td>{{item.vote_count}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
 
+<script>
+  const app = Vue.createApp({
+    data() {
+      return {
+        provider: '',
+        movie_name: '',
+        quote: '',
+        insertResult: '',
+        items: []
+      }
+    },
+    methods: {
+      async insertData() {
+        const response = await fetch('/api/insert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            provider: this.provider,
+            movie_name: this.movie_name,
+            quote: this.quote
+          })
+        })
+        this.insertResult = await response.text()
+        setTimeout(() => {
+          this.insertResult = ''
+        }, 3000)
+      },
+      async fetchData() {
+        const response = await fetch('/api/quotes')
+        this.items = await response.json()
+      }
+    }
+  })
+  app.mount('#app')
+
+</script>
+
+</body>
+<!---->
 </html>
